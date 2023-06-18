@@ -13,7 +13,7 @@ module Neo4j::Driver::Internal::Util
     }.freeze
 
     class << self
-      def new_connection_terminated_error(reason)
+      def new_connection_terminated_error(reason=nil)
         reason ||= DEFAULT_CONN_TERMINATED_REASON
         Neo4j::Driver::Exceptions::ServiceUnavailableException.new("Connection to the database terminated. #{reason}")
       end

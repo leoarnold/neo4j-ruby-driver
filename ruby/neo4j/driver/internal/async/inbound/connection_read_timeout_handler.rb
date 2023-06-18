@@ -5,7 +5,7 @@ module Neo4j::Driver
         class ConnectionReadTimeoutHandler #< org.neo4j.driver.internal.shaded.io.netty.handler.timeout.ReadTimeoutHandler
           def read_timeout(ctx)
             unless @triggered
-              ctx.fire_exception_caught(Neo4j::Driver::Exception::ConnectionReadTimeoutException::INSTANCE)
+              ctx.fire_exception_caught(Neo4j::Driver::Exceptions::ConnectionReadTimeoutException::INSTANCE)
               ctx.close
               @triggered = true
             end

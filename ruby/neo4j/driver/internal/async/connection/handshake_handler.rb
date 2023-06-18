@@ -80,30 +80,28 @@ module Neo4j::Driver
             ctx.close.add_listener { @handshake_completed_promise.try_failure(error) }
           end
 
-          class << self
-            def protocol_no_supported_by_server_error
-              raise Neo4j::Driver::Exception::ClientException, 'The server does not support any of the protocol versions supported by this driver. Ensure that you are using driver and server versions that are compatible with one another.'
-            end
+          def protocol_no_supported_by_server_error
+            raise Neo4j::Driver::Exceptions::ClientException, 'The server does not support any of the protocol versions supported by this driver. Ensure that you are using driver and server versions that are compatible with one another.'
+          end
 
-            def http_endpoint_error
-              raise Neo4j::Driver::Exception::ClientException, 'Server responded HTTP. Make sure you are not trying to connect to the http endpoint (HTTP defaults to port 7474 whereas BOLT defaults to port 7687)'
-            end
+          def http_endpoint_error
+            raise Neo4j::Driver::Exceptions::ClientException, 'Server responded HTTP. Make sure you are not trying to connect to the http endpoint (HTTP defaults to port 7474 whereas BOLT defaults to port 7687)'
+          end
 
-            def protocol_no_supported_by_driver_error(suggested_protocol_version)
-              raise Neo4j::Driver::Exception::ClientException, "Protocol error, server suggested unexpected protocol version: #{suggested_protocol_version}"
-            end
+          def protocol_no_supported_by_driver_error(suggested_protocol_version)
+            raise Neo4j::Driver::Exceptions::ClientException, "Protocol error, server suggested unexpected protocol version: #{suggested_protocol_version}"
+          end
 
-            def transform_error(error)
-              # unwrap the DecoderException if it has a cause
-              error = error.cause if error.is_a?(org.neo4j.driver.internal.shaded.io.netty.handler.codec.DecoderException) && error.cause
-              case error
-              when Neo4j::Driver::Exception::ServiceUnavailableException
-                error
-              when javax.net.ssl.SSLHandshakeException
-                Neo4j::Driver::Exception::SecurityException.new('Failed to establish secured connection with the server', error)
-              else
-                Neo4j::Driver::Exception::ServiceUnavailableException('Failed to establish connection with the server', error)
-              end
+          def transform_error(error)
+            # unwrap the DecoderException if it has a cause
+            error = error.cause if error.is_a?(org.neo4j.driver.internal.shaded.io.netty.handler.codec.DecoderException) && error.cause
+            case error
+            when Neo4j::Driver::Exceptions::ServiceUnavailableException
+              error
+            when javax.net.ssl.SSLHandshakeException
+              Neo4j::Driver::Exceptions::SecurityException.new('Failed to establish secured connection with the server', error)
+            else
+              Neo4j::Driver::Exceptions::ServiceUnavailableException('Failed to establish connection with the server', error)
             end
           end
         end
